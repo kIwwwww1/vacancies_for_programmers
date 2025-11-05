@@ -1,15 +1,18 @@
+import asyncio
 from sqlalchemy import select
 from aiogram import Router, F, types
 from aiogram.filters import CommandStart, Command
 from os import getenv
 from dotenv import load_dotenv
 from database_config.database_setting import User, create_session
+from user_keyboards.reply_kb import create_note
 
 load_dotenv()
 
 CHAT_ID = getenv('CHAT_ID')
 
 user_router = Router()
+
 
 @user_router.message(CommandStart())
 async def start_command(message: types.Message):
@@ -19,6 +22,6 @@ async def start_command(message: types.Message):
         user = (await session.execute(select(User).where(User.id == user_id))).scalar_one_or_none()
         if not user:
             session.add(User(id=user_id, user_name=name))
-            await message.answer(f'Привет {name}')
+            await message.answer(f'Привет {name}', reply_markup=create_note)
         else:
-            await message.answer(f'С возвращением, {name}!')
+            await message.answer(f'С возвращением, {name}!', reply_markup=create_note)
