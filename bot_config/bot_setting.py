@@ -1,5 +1,6 @@
 import asyncio
 from aiogram import Dispatcher, Bot
+from aiogram.fsm.storage.memory import MemoryStorage
 from os import getenv
 from dotenv import load_dotenv
 from database_config.database_setting import create_database
@@ -12,7 +13,7 @@ load_dotenv()
 BOT_TOKEN = getenv('BOT_TOKEN')
 
 bot = Bot(token=BOT_TOKEN) # type: ignore
-dp = Dispatcher()
+dp = Dispatcher(storage=MemoryStorage())
 
 async def main():
     await create_database()

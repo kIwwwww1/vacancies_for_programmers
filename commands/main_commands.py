@@ -13,7 +13,6 @@ CHAT_ID = int(getenv('CHAT_ID')) # type: ignore
 user_router = Router()
 
 
-
 @user_router.message(CommandStart())
 async def start_command(message: types.Message):
     user_id = message.from_user.id

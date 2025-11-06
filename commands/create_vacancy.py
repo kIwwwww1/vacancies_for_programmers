@@ -2,7 +2,8 @@ from aiogram import types, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from user_keyboards.reply_kb import ReplyTextCommand
-from user_keyboards.inline_kb import reset_note
+from user_keyboards.inline_kb import action_from_note
+from .main_commands import CHAT_ID
 
 vacancy_router = Router()
 
@@ -111,9 +112,7 @@ async def process_contacts(message: types.Message, state: FSMContext):
 async def process_stack(message: types.Message, state: FSMContext):
     await state.update_data(stack=message.text)
     data = await state.get_data()
-    
-    await message.answer(
-        f'<b>Ваша вакансия создана:</b>\n'
+    user_respons = await message.answer(
         f'<b>Название:</b> {data["title"]}\n'
         f'<b>Тип занятости:</b> {data["type_of_employment"]}\n'
         f'<b>Уровень:</b> {data["user_level"]}\n'
@@ -124,7 +123,24 @@ async def process_stack(message: types.Message, state: FSMContext):
         f'<b>Дополнительно:</b> {data["additionally"]}\n'
         f'<b>Контакты:</b> {data["contacts"]}\n'
         f'<b>Стек технологий:</b> {data["stack"]}', parse_mode='HTML')
-    
+    await state.update_data(vacancy_message_id=user_respons.message_id)
+    await message.answer('Предпросмотр вакансии', reply_markup=action_from_note)
+
+@vacancy_router.callback_query(F.data == 'create_user_note')
+async def add_note(callback: types.CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+    print(user_data)
+    await callback.answer('Создание вакансии...')
+    await callback.bot.copy_message(chat_id=CHAT_ID,
+                                    from_chat_id=callback.message.chat.id ,
+                                    message_id=user_data['vacancy_message_id'])
+    await callback.bot.delete_message(chat_id=callback.message.chat.id, message_id=user_data['vacancy_message_id'])
+    await state.clear()
+
+@vacancy_router.callback_query(F.data == 'reset_user_note')
+async def delete_note(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.delete()
+    await callback.message.answer(text='Вакансия удалена')
     await state.clear()
 
 
