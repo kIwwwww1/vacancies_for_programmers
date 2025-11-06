@@ -12,6 +12,7 @@ class CreateNote(StatesGroup):
     await_type_of_employment = State()
     await_user_level = State()
     await_location = State()
+    await_country = State()
     await_responsibilities = State()
     await_requirements = State()
     await_mb_plus = State()
@@ -58,6 +59,15 @@ async def process_user_level(message: types.Message, state: FSMContext):
 @vacancy_router.message(CreateNote.await_location)
 async def process_location(message: types.Message, state: FSMContext):
     await state.update_data(location=message.text)
+    await message.answer(
+        '<b>Укажите страну</b>\n'
+        'Пример: <i>RU, USA, UK</i>', parse_mode='HTML')
+    await state.set_state(CreateNote.await_country)
+
+
+@vacancy_router.message(CreateNote.await_country)
+async def process_country(message: types.Message, state: FSMContext):
+    await state.update_data(country=message.text)
     await message.answer(
         '<b>Укажите обязанности</b>\n'
         'Пример: <i>Разработка бэкенда, участие в проектах</i>', parse_mode='HTML')
@@ -112,43 +122,44 @@ async def process_contacts(message: types.Message, state: FSMContext):
 async def process_stack(message: types.Message, state: FSMContext):
     await state.update_data(stack=message.text)
     data = await state.get_data()
-    user_respons = await message.answer(
-        f'<b>Название:</b> {data["title"]}\n'
-        f'<b>Тип занятости:</b> {data["type_of_employment"]}\n'
-        f'<b>Уровень:</b> {data["user_level"]}\n'
-        f'<b>Локация:</b> {data["location"]}\n'
-        f'<b>Обязанности:</b> {data["responsibilities"]}\n'
-        f'<b>Требования:</b> {data["requirements"]}\n'
-        f'<b>Будет плюсом:</b> {data["mb_plus"]}\n'
-        f'<b>Дополнительно:</b> {data["additionally"]}\n'
-        f'<b>Контакты:</b> {data["contacts"]}\n'
-        f'<b>Стек технологий:</b> {data["stack"]}', parse_mode='HTML')
-    await state.update_data(vacancy_message_id=user_respons.message_id)
+    user_response = await message.answer(
+            f'{data["title"]}\n\n'
+            f'Тип занятости: #{data["type_of_employment"]}\n'
+            f'Уровень: #{data["user_level"]}\n'
+            f'Страна: #{data.get("country", "RU")}\n'
+            f'Локация: #{data["location"]}\n\n'
+            f'{data["title"]}\n\n'
+            f'<b>Обязанности</b>\n'
+            f'{data["responsibilities"]}\n\n'
+            f'<b>Требования</b>\n'
+            f'{data["requirements"]}\n\n'
+            f'<b>Будет плюсом</b>\n'
+            f'{data["mb_plus"]}\n\n'
+            f'<b>Что предлагаем</b>\n'
+            f'{data["additionally"]}\n\n'
+            f'<b>Контакты</b>\n'
+            f'{data["contacts"]}\n\n'
+            f'⚠️ Для удобства указывайте ссылку на вакансию\n'
+            # f'Ссылка: {data.get("vacancy_link", "—")}\n\n'
+            f'Стек технологий: {data["stack"]}',parse_mode='HTML')
+    await state.update_data(vacancy_message_id=user_response.message_id)
     await message.answer('Предпросмотр вакансии', reply_markup=action_from_note)
+
 
 @vacancy_router.callback_query(F.data == 'create_user_note')
 async def add_note(callback: types.CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
-    print(user_data)
     await callback.answer('Создание вакансии...')
+    await callback.message.delete()
     await callback.bot.copy_message(chat_id=CHAT_ID,
                                     from_chat_id=callback.message.chat.id ,
                                     message_id=user_data['vacancy_message_id'])
     await callback.bot.delete_message(chat_id=callback.message.chat.id, message_id=user_data['vacancy_message_id'])
     await state.clear()
 
+
 @vacancy_router.callback_query(F.data == 'reset_user_note')
 async def delete_note(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.delete()
     await callback.message.answer(text='Вакансия удалена')
     await state.clear()
-
-
-
-# # @vacancy_router.message(F.text == ReplyTextCommand.CREATE_RESUME)
-# # async def create_resume_command(message: types.Message, state: FSMContext):
-# #     await message.answer('РЕЗЮМЕ')
-
-
-# # Сделать что бы 1 резюме можно было вылоить бесплатно, 
-# # что бы выложить второе резюме или вакансию надо заплатить
