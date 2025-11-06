@@ -5,11 +5,11 @@ from aiogram.filters import CommandStart, Command
 from os import getenv
 from dotenv import load_dotenv
 from database_config.database_setting import User, create_session
-from user_keyboards.reply_kb import create_note
+from user_keyboards.reply_kb import ReplyTextCommand, create_note
 
 load_dotenv()
 
-CHAT_ID = getenv('CHAT_ID')
+CHAT_ID = int(getenv('CHAT_ID'))
 
 user_router = Router()
 
@@ -25,3 +25,7 @@ async def start_command(message: types.Message):
             await message.answer(f'Привет {name}', reply_markup=create_note)
         else:
             await message.answer(f'С возвращением, {name}!', reply_markup=create_note)
+
+@user_router.message(F.text == ReplyTextCommand.CREATE_NOTE)
+async def create_note_command(message: types.Message):
+    await message.bot.send_message(chat_id=CHAT_ID, text='Добавить действие для ReplyTextCommand.CREATE_NOTE')
