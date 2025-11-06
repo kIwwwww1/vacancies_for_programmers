@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from database_config.database_setting import create_database
 from logging import basicConfig, INFO 
 from commands.main_commands import user_router
+from commands.create_vacancy import vacancy_router
 
 load_dotenv()
 
@@ -17,7 +18,7 @@ async def main():
     await create_database()
     print(' Бот запущен '.center(80, '='))
     print(basicConfig(level=INFO))
-    dp.include_router(user_router)
+    dp.include_routers(user_router, vacancy_router)
     await dp.start_polling(bot)
     print(' Бот остановлен '.center(80, '='))
 
