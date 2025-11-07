@@ -3,7 +3,6 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from user_keyboards.reply_kb import ReplyTextCommand
 from user_keyboards.inline_kb import action_from_note_resume
-from database_config.database_setting import create_session, User
 from user_keyboards.reply_kb import ReplyTextCommand, delete_resume_or_vacancy, create_note
 from .main_commands import CHAT_ID
 
@@ -98,13 +97,10 @@ async def process_stack(message: types.Message, state: FSMContext):
 async def add_resume(callback: types.CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
     await callback.message.delete()
-    await callback.bot.copy_message(
-        chat_id=CHAT_ID, 
-        from_chat_id=callback.message.chat.id, 
+    await callback.bot.copy_message(chat_id=CHAT_ID,
+        from_chat_id=callback.message.chat.id,
         message_id=user_data['resume_message_id'])
-    await callback.bot.delete_message(
-        chat_id=callback.message.chat.id,
-        message_id=user_data['resume_message_id'])
+    await callback.bot.delete_message(chat_id=callback.message.chat.id, message_id=user_data['resume_message_id'])
     await state.clear()
     await callback.message.answer('Резюме создано и опубликовано ✅', reply_markup=create_note)
 
