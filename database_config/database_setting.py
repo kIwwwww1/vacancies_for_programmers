@@ -1,11 +1,24 @@
-import asyncio
+from os import getenv
+from dotenv import load_dotenv
 from sqlalchemy import BigInteger
 from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from contextlib import asynccontextmanager
 
-engine = create_async_engine('postgresql+asyncpg://postgres:12345@localhost:5432/postgres')
+load_dotenv()
+
+POSTGRES_USER = getenv("POSTGRES_USER")
+POSTGRES_PASSWORD = getenv("POSTGRES_PASSWORD")
+POSTGRES_DB = getenv("POSTGRES_DB")
+DB_HOST = getenv("DB_HOST")
+DB_PORT = getenv("DB_PORT")
+
+DATABASE_URL = f"postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{DB_HOST}:{DB_PORT}/{POSTGRES_DB}"
+
+engine = create_async_engine(url=DATABASE_URL) #type: ignore
+
 async_session = async_sessionmaker(engine)
+# engine = create_async_engine('postgresql+asyncpg://postgres:12345@localhost:5432/postgres')
 
 class Base(DeclarativeBase):
     pass
