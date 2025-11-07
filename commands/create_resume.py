@@ -11,7 +11,7 @@ resume_router = Router()
 class CreateResume(StatesGroup):
     await_form_work = State()
     await_employment = State()
-    await_salary = State()  
+    await_salary = State()
     await_contacts = State()
     await_about_me = State()
     await_stack = State()
@@ -22,10 +22,7 @@ class CreateResume(StatesGroup):
 async def create_resume_command(message: types.Message, state: FSMContext):
     await message.answer(
         '<b>Введите желаемый формат работы</b>\n'
-        'Пример: <i>Удалённо</i>',
-        parse_mode='HTML',
-        reply_markup=delete_resume_or_vacancy
-    )
+        'Пример: <i>Удалённо</i>', parse_mode='HTML', reply_markup=delete_resume_or_vacancy)
     await state.set_state(CreateResume.await_form_work)
 
 
@@ -34,9 +31,7 @@ async def process_form_work(message: types.Message, state: FSMContext):
     await state.update_data(form_work=message.text.capitalize())
     await message.answer(
         '<b>Укажите тип занятости</b>\n'
-        'Пример: <i>Полная / Частичная/Полная / Проектная</i>',
-        parse_mode='HTML'
-    )
+        'Пример: <i>Полная / Частичная/Полная / Проектная</i>', parse_mode='HTML')
     await state.set_state(CreateResume.await_employment)
 
 
