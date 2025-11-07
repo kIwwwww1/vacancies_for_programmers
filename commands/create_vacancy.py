@@ -124,6 +124,7 @@ async def process_stack(message: types.Message, state: FSMContext):
     await state.update_data(stack=message.text)
     data = await state.get_data()
     user_response = await message.answer(
+            f'#вакансия'
             f'{data["title"]}\n\n'
             f'Тип занятости: #{data["type_of_employment"]}\n'
             f'Уровень: #{data["user_level"]}\n'

@@ -10,123 +10,80 @@ from .main_commands import CHAT_ID
 resume_router = Router()
 
 class CreateResume(StatesGroup):
-    await_name = State()
-    await_age = State()
-    await_position = State()
-    await_location = State()
-    await_country = State()
-    await_experience = State()
-    await_education = State()
-    await_skills = State()
-    await_about = State()
+    await_form_work = State()
+    await_employment = State()
+    await_salary = State()
     await_contacts = State()
+    await_about_me = State()
     await_stack = State()
+    await_additionally = State()
 
 
 @resume_router.message(F.text == ReplyTextCommand.CREATE_RESUME)
 async def create_resume_command(message: types.Message, state: FSMContext):
     await message.answer(
-        '<b>Введите ваше имя и фамилию</b>\n'
-        'Пример: <i>Иван Иванов</i>', parse_mode='HTML', reply_markup=delete_resume_or_vacancy)
-    await state.set_state(CreateResume.await_name)
+        '<b>Введите формат работы</b>\n'
+        'Пример: <i>удалённо</i>', parse_mode='HTML', reply_markup=delete_resume_or_vacancy)
+    await state.set_state(CreateResume.await_employment)
 
 
-@resume_router.message(CreateResume.await_name)
+@resume_router.message(CreateResume.await_employment)
 async def process_name(message: types.Message, state: FSMContext):
     await state.update_data(name=message.text)
     await message.answer(
         '<b>Укажите ваш возраст</b>\n'
         'Пример: <i>25 лет</i>', parse_mode='HTML')
-    await state.set_state(CreateResume.await_age)
+    await state.set_state(CreateResume.await_salary)
 
 
-@resume_router.message(CreateResume.await_age)
+@resume_router.message(CreateResume.await_salary)
 async def process_age(message: types.Message, state: FSMContext):
     await state.update_data(age=message.text)
     await message.answer(
         '<b>Укажите желаемую должность</b>\n'
         'Пример: <i>Python Developer</i>', parse_mode='HTML')
-    await state.set_state(CreateResume.await_position)
+    await state.set_state(CreateResume.await_contacts)
 
 
-@resume_router.message(CreateResume.await_position)
+@resume_router.message(CreateResume.await_contacts)
 async def process_position(message: types.Message, state: FSMContext):
     await state.update_data(position=message.text)
     await message.answer(
         '<b>Укажите вашу локацию</b>\n'
         'Пример: <i>Moscow, Remote</i>', parse_mode='HTML')
-    await state.set_state(CreateResume.await_location)
+    await state.set_state(CreateResume.await_about_me)
 
 
-@resume_router.message(CreateResume.await_location)
+@resume_router.message(CreateResume.await_about_me)
 async def process_location(message: types.Message, state: FSMContext):
     await state.update_data(location=message.text)
     await message.answer(
         '<b>Укажите вашу страну</b>\n'
         'Пример: <i>RU, USA, UK</i>', parse_mode='HTML')
-    await state.set_state(CreateResume.await_country)
+    await state.set_state(CreateResume.await_stack)
 
 
-@resume_router.message(CreateResume.await_country)
+@resume_router.message(CreateResume.await_stack)
 async def process_country(message: types.Message, state: FSMContext):
     await state.update_data(country=message.text)
     await message.answer(
         '<b>Опишите ваш опыт работы</b>\n'
         'Пример: <i>2 года в компании X на позиции Junior Python Developer</i>', parse_mode='HTML')
-    await state.set_state(CreateResume.await_experience)
+    await state.set_state(CreateResume.await_additionally)
 
 
-@resume_router.message(CreateResume.await_experience)
+@resume_router.message(CreateResume.await_additionally)
 async def process_experience(message: types.Message, state: FSMContext):
     await state.update_data(experience=message.text)
     await message.answer(
         '<b>Укажите образование</b>\n'
         'Пример: <i>МГУ, Факультет ВМК, 2021</i>', parse_mode='HTML')
-    await state.set_state(CreateResume.await_education)
 
-
-@resume_router.message(CreateResume.await_education)
-async def process_education(message: types.Message, state: FSMContext):
-    await state.update_data(education=message.text)
-    await message.answer(
-        '<b>Укажите ключевые навыки</b>\n'
-        'Пример: <i>Python, Django, Git, SQL</i>', parse_mode='HTML')
-    await state.set_state(CreateResume.await_skills)
-
-
-@resume_router.message(CreateResume.await_skills)
-async def process_skills(message: types.Message, state: FSMContext):
-    await state.update_data(skills=message.text)
-    await message.answer(
-        '<b>Расскажите немного о себе</b>\n'
-        'Пример: <i>Ответственный, люблю командную работу, быстро обучаюсь</i>', parse_mode='HTML')
-    await state.set_state(CreateResume.await_about)
-
-
-@resume_router.message(CreateResume.await_about)
-async def process_about(message: types.Message, state: FSMContext):
-    await state.update_data(about=message.text)
-    await message.answer(
-        '<b>Укажите контакты для связи</b>\n'
-        'Пример: <i>telegram: @username, email: example@mail.com</i>', parse_mode='HTML')
-    await state.set_state(CreateResume.await_contacts)
-
-
-@resume_router.message(CreateResume.await_contacts)
-async def process_contacts(message: types.Message, state: FSMContext):
-    await state.update_data(contacts=message.text)
-    await message.answer(
-        '<b>Укажите стек технологий</b>\n'
-        'Пример: <i>Python, FastAPI, PostgreSQL</i>', parse_mode='HTML')
-    await state.set_state(CreateResume.await_stack)
-
-
-@resume_router.message(CreateResume.await_stack)
-async def process_stack(message: types.Message, state: FSMContext):
     await state.update_data(stack=message.text)
     data = await state.get_data()
 
     user_response = await message.answer(
+        f'#резюме'
         f'<b>{data["name"]}</b>\n'
         f'Возраст: {data["age"]}\n'
         f'Страна: #{data.get("country", "RU")}\n'
