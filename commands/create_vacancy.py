@@ -35,40 +35,40 @@ async def process_title(message: types.Message, state: FSMContext):
     await state.update_data(title=message.text)
     await message.answer(
         '<b>Укажите тип занятости</b>\n'
-        'Пример: <i>Full-time, Part-time, Internship</i>', parse_mode='HTML')
+        'Пример: <i>Full-time / Неполная / Стажировка</i>', parse_mode='HTML')
     await state.set_state(CreateNote.await_type_of_employment)
 
 
 @vacancy_router.message(CreateNote.await_type_of_employment)
 async def process_type_of_employment(message: types.Message, state: FSMContext):
-    await state.update_data(type_of_employment=message.text)
+    await state.update_data(type_of_employment=message.text.capitalize())
     await message.answer(
         '<b>Укажите уровень пользователя</b>\n'
-        'Пример: <i>Junior, Middle, Senior</i>', parse_mode='HTML')
+        'Пример: <i>Junior, Middle, Middle/Senior</i>', parse_mode='HTML')
     await state.set_state(CreateNote.await_user_level)
 
 
 @vacancy_router.message(CreateNote.await_user_level)
 async def process_user_level(message: types.Message, state: FSMContext):
-    await state.update_data(user_level=message.text)
+    await state.update_data(user_level=message.text.title())
     await message.answer(
         '<b>Укажите локацию</b>\n'
-        'Пример: <i>Moscow, Remote</i>', parse_mode='HTML')
+        'Пример: <i>Moscow / Remote</i>', parse_mode='HTML')
     await state.set_state(CreateNote.await_location)
 
 
 @vacancy_router.message(CreateNote.await_location)
 async def process_location(message: types.Message, state: FSMContext):
-    await state.update_data(location=message.text)
+    await state.update_data(location=message.text.title())
     await message.answer(
         '<b>Укажите страну</b>\n'
-        'Пример: <i>RU, USA, UK</i>', parse_mode='HTML')
+        'Пример: <i>RU</i>', parse_mode='HTML')
     await state.set_state(CreateNote.await_country)
 
 
 @vacancy_router.message(CreateNote.await_country)
 async def process_country(message: types.Message, state: FSMContext):
-    await state.update_data(country=message.text)
+    await state.update_data(country=message.text.upper())
     await message.answer(
         '<b>Укажите обязанности</b>\n'
         'Пример: <i>Разработка бэкенда, участие в проектах</i>', parse_mode='HTML')
@@ -106,7 +106,7 @@ async def process_additionally(message: types.Message, state: FSMContext):
     await state.update_data(additionally=message.text)
     await message.answer(
         '<b>Укажите контакты</b>\n'
-        'Пример: <i>telegram: @username, email: example@mail.com</i>', parse_mode='HTML')
+        'Пример: <i>telegram: @username / email: example@mail.com</i>', parse_mode='HTML')
     await state.set_state(CreateNote.await_contacts)
 
 
@@ -114,21 +114,21 @@ async def process_additionally(message: types.Message, state: FSMContext):
 async def process_contacts(message: types.Message, state: FSMContext):
     await state.update_data(contacts=message.text)
     await message.answer(
-        '<b>Укажите стек технологий</b>\n'
-        'Пример: <i>Python, Django, PostgreSQL</i>', parse_mode='HTML')
+        '<b>Укажите стек технологий через # и ,</b>\n'
+        'Пример: <i>#Python, #Django, #PostgreSQL</i>', parse_mode='HTML')
     await state.set_state(CreateNote.await_stack)
 
 
 @vacancy_router.message(CreateNote.await_stack)
 async def process_stack(message: types.Message, state: FSMContext):
-    await state.update_data(stack=message.text)
+    await state.update_data(stack=message.text.title())
     data = await state.get_data()
     user_response = await message.answer(
-            f'#вакансия'
+            f'#вакансия\n\n'
             f'{data["title"]}\n\n'
             f'Тип занятости: #{data["type_of_employment"]}\n'
             f'Уровень: #{data["user_level"]}\n'
-            f'Страна: #{data.get("country", "RU")}\n'
+            f'Страна: #{data.get("country", "Не указано")}\n'
             f'Локация: #{data["location"]}\n\n'
             f'{data["title"]}\n\n'
             f'<b>Обязанности</b>\n'
@@ -141,7 +141,7 @@ async def process_stack(message: types.Message, state: FSMContext):
             f'{data["additionally"]}\n\n'
             f'<b>Контакты</b>\n'
             f'{data["contacts"]}\n\n'
-            f'Стек технологий: {data["stack"]}',parse_mode='HTML')
+            f'<b>Стек технологий</b>: {data["stack"]}',parse_mode='HTML')
     await state.update_data(vacancy_message_id=user_response.message_id)
     await message.answer('Предпросмотр вакансии', reply_markup=action_from_note)
 
