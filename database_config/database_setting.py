@@ -16,9 +16,7 @@ DB_PORT = getenv("DB_PORT")
 DATABASE_URL = f"postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{DB_HOST}:{DB_PORT}/{POSTGRES_DB}"
 
 engine = create_async_engine(url=DATABASE_URL) #type: ignore
-
 async_session = async_sessionmaker(engine)
-# engine = create_async_engine('postgresql+asyncpg://postgres:12345@localhost:5432/postgres')
 
 class Base(DeclarativeBase):
     pass
@@ -42,7 +40,7 @@ async def create_session():
 
 async def create_database():
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-        print('База удалена')
+        # await conn.run_sync(Base.metadata.drop_all)
+        # print('База удалена')
         await conn.run_sync(Base.metadata.create_all)
         print('База создана')

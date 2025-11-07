@@ -19,7 +19,6 @@ dp = Dispatcher(storage=MemoryStorage())
 async def main():
     await create_database()
     print(' Бот запущен '.center(80, '='))
-    print(basicConfig(level=INFO))
     dp.include_routers(user_router, vacancy_router, resume_router)
     await dp.start_polling(bot)
     print(' Бот остановлен '.center(80, '='))
