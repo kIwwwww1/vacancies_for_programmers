@@ -1,7 +1,7 @@
 from aiogram import types, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from user_keyboards.reply_kb import ReplyTextCommand, delete_resume_or_vacancy
+from user_keyboards.reply_kb import ReplyTextCommand, delete_resume_or_vacancy, create_note
 from user_keyboards.inline_kb import action_from_note
 from database_config.database_setting import create_session, User
 from .main_commands import CHAT_ID
@@ -155,11 +155,11 @@ async def add_note(callback: types.CallbackQuery, state: FSMContext):
                                     message_id=user_data['vacancy_message_id'])
     await callback.bot.delete_message(chat_id=callback.message.chat.id, message_id=user_data['vacancy_message_id'])
     await state.clear()
-    await callback.message.answer('Вакансия создана и опубликовано ✅')
+    await callback.message.answer('Вакансия создана и опубликовано ✅', reply_markup=create_note)
 
 
 @vacancy_router.callback_query(F.data == 'reset_user_note')
 async def delete_note(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.delete()
-    await callback.message.answer(text='Вакансия удалена ❌')
+    await callback.message.answer(text='Вакансия удалена ❌', reply_markup=create_note)
     await state.clear()
