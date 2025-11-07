@@ -2,9 +2,10 @@ from os import getenv
 from dotenv import load_dotenv
 from sqlalchemy import select
 from aiogram import Router, F, types
-from aiogram.filters import CommandStart
+from aiogram.filters import CommandStart, Command
+from aiogram.fsm.context import FSMContext
 from database_config.database_setting import User, create_session
-from user_keyboards.reply_kb import create_note
+from user_keyboards.reply_kb import ReplyTextCommand, create_note
 
 load_dotenv()
 
@@ -25,4 +26,8 @@ async def start_command(message: types.Message):
         else:
             await message.answer(f'С возвращением, {name}!', reply_markup=create_note)
 
-
+@user_router.message(F.text == ReplyTextCommand.DELETE)
+async def all_delete_note(message: types.Message, state: FSMContext):
+    await state.clear()
+    await message.answer('Создание сброшено', reply_markup=create_note)
+    

@@ -1,8 +1,9 @@
 from aiogram import types, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from user_keyboards.reply_kb import ReplyTextCommand
+from user_keyboards.reply_kb import ReplyTextCommand, delete_resume_or_vacancy
 from user_keyboards.inline_kb import action_from_note
+from database_config.database_setting import create_session, User
 from .main_commands import CHAT_ID
 
 vacancy_router = Router()
@@ -25,7 +26,7 @@ class CreateNote(StatesGroup):
 async def create_vacancy_command(message: types.Message, state: FSMContext):
     await message.answer(
         '<b>Укажите название для вакансии</b>\n'
-        'Пример: <i>Junior Python Developer</i>', parse_mode='HTML')
+        'Пример: <i>Junior Python Developer</i>', reply_markup=delete_resume_or_vacancy, parse_mode='HTML')
     await state.set_state(CreateNote.await_title)
 
 
@@ -139,8 +140,6 @@ async def process_stack(message: types.Message, state: FSMContext):
             f'{data["additionally"]}\n\n'
             f'<b>Контакты</b>\n'
             f'{data["contacts"]}\n\n'
-            f'⚠️ Для удобства указывайте ссылку на вакансию\n'
-            # f'Ссылка: {data.get("vacancy_link", "—")}\n\n'
             f'Стек технологий: {data["stack"]}',parse_mode='HTML')
     await state.update_data(vacancy_message_id=user_response.message_id)
     await message.answer('Предпросмотр вакансии', reply_markup=action_from_note)
@@ -149,17 +148,17 @@ async def process_stack(message: types.Message, state: FSMContext):
 @vacancy_router.callback_query(F.data == 'create_user_note')
 async def add_note(callback: types.CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
-    await callback.answer('Создание вакансии...')
     await callback.message.delete()
     await callback.bot.copy_message(chat_id=CHAT_ID,
                                     from_chat_id=callback.message.chat.id ,
                                     message_id=user_data['vacancy_message_id'])
     await callback.bot.delete_message(chat_id=callback.message.chat.id, message_id=user_data['vacancy_message_id'])
     await state.clear()
+    await callback.message.answer('Вакансия создана и опубликовано ✅')
 
 
 @vacancy_router.callback_query(F.data == 'reset_user_note')
 async def delete_note(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.delete()
-    await callback.message.answer(text='Вакансия удалена')
+    await callback.message.answer(text='Вакансия удалена ❌')
     await state.clear()

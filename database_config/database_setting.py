@@ -15,7 +15,6 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, unique=True)
     user_name: Mapped[str] = mapped_column(nullable=False)
-    user_tokens: Mapped[int] = mapped_column(default=1, nullable= False)
 
 @asynccontextmanager
 async def create_session():
