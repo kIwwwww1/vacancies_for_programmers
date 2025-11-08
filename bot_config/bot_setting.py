@@ -4,7 +4,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from os import getenv
 from dotenv import load_dotenv
 from database_config.database_setting import create_database
-from logging import basicConfig, INFO 
+# from logging import basicConfig, INFO 
 from commands.main_commands import user_router
 from commands.create_vacancy import vacancy_router
 from commands.create_resume import resume_router
