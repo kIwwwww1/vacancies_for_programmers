@@ -32,11 +32,14 @@ async def start_command(message: types.Message):
 @user_router.message(F.text == ReplyTextCommand.DELETE)
 async def all_delete_note(message: types.Message, state: FSMContext):
     await state.clear()
-    await message.answer('Создание сброшено', reply_markup=create_note)
+    await message.answer('Создание сброшено ✅', reply_markup=create_note)
     
 @user_router.message(F.text == ReplyTextCommand.REPORT_BUG)
 async def report_bug(message: types.Message, state: FSMContext):
-    await message.answer('Опишите что произошло', reply_markup=create_note)
+    await message.answer(
+        '<b>Опишите что произошло</b>\n'
+        'Пример: <i>Не публикуется вакансия</i>'
+        , reply_markup=create_note, parse_mode='HTML')
     await state.set_state(Report.create_repost)
 
 @user_router.message(Report.create_repost)
@@ -48,5 +51,5 @@ async def message_bug(message: types.Message, state: FSMContext):
         chat_id=CHAT_ID,
         from_chat_id=message.chat.id,
         message_id=user_report.message_id)
-    await message.answer('Ошибка опубликована', reply_markup=create_note)
+    await message.answer('Ошибка опубликована ✅', reply_markup=create_note)
     await state.clear()
