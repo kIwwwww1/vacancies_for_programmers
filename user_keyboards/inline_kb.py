@@ -25,6 +25,6 @@ report_message = InlineKeyboardMarkup(inline_keyboard=[
 ])
 
 report_and_create_message = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text=InlineTextCommand.REPORT, url='https://t.me/Receiver_of_God')],
-    [InlineKeyboardButton(text=InlineTextCommand.CREATE, url='https://t.me/IT_Jobs_Officially_Bot')]
+    [InlineKeyboardButton(text=InlineTextCommand.CREATE, url='https://t.me/IT_Jobs_Officially_Bot')],
+    [InlineKeyboardButton(text=InlineTextCommand.REPORT, url='https://t.me/Receiver_of_God')]
 ])
