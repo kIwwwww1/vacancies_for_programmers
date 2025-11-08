@@ -18,11 +18,11 @@ dp = Dispatcher(storage=MemoryStorage())
 
 async def main():
     await create_database()
-    print(' Бот запущен '.center(80, '='))
+    print(' Бот запущен '.center(20, '='))
     await bot.delete_webhook(drop_pending_updates=True)
     dp.include_routers(user_router, vacancy_router, resume_router)
     await dp.start_polling(bot)
-    print(' Бот остановлен '.center(80, '='))
+    print(' Бот остановлен '.center(20, '='))
 
 if __name__ == '__main__':
     asyncio.run(main())

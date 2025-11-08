@@ -2,7 +2,7 @@ from aiogram import types, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from user_keyboards.reply_kb import ReplyTextCommand
-from user_keyboards.inline_kb import action_from_note_resume
+from user_keyboards.inline_kb import action_from_note_resume, report_and_create_message
 from user_keyboards.reply_kb import ReplyTextCommand, delete_resume_or_vacancy, create_note
 from .main_commands import CHAT_ID
 
@@ -94,7 +94,7 @@ async def add_resume(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.delete()
     await callback.bot.copy_message(chat_id=CHAT_ID,
         from_chat_id=callback.message.chat.id,
-        message_id=user_data['resume_message_id'])
+        message_id=user_data['resume_message_id'], reply_markup=report_and_create_message)
     await callback.bot.delete_message(chat_id=callback.message.chat.id, message_id=user_data['resume_message_id'])
     await state.clear()
     await callback.message.answer('Резюме создано и опубликовано ✅', reply_markup=create_note)

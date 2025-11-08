@@ -6,7 +6,8 @@ from aiogram.filters import CommandStart, Command
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 from database_config.database_setting import User, create_session
-from user_keyboards.reply_kb import ReplyTextCommand, create_note
+from user_keyboards.reply_kb import ReplyTextCommand, create_note, delete_resume_or_vacancy
+from user_keyboards.inline_kb import report_message
 
 load_dotenv()
 
@@ -39,7 +40,7 @@ async def report_bug(message: types.Message, state: FSMContext):
     await message.answer(
         '<b>Опишите что произошло</b>\n'
         'Пример: <i>Не публикуется вакансия</i>'
-        , reply_markup=create_note, parse_mode='HTML')
+        , reply_markup=delete_resume_or_vacancy, parse_mode='HTML')
     await state.set_state(Report.create_repost)
 
 @user_router.message(Report.create_repost)
@@ -50,6 +51,11 @@ async def message_bug(message: types.Message, state: FSMContext):
     await message.bot.copy_message(
         chat_id=CHAT_ID,
         from_chat_id=message.chat.id,
-        message_id=user_report.message_id)
+        message_id=user_report.message_id, reply_markup=report_message)
     await message.answer('Ошибка опубликована ✅', reply_markup=create_note)
     await state.clear()
+
+
+@user_router.message()
+async def random_message(message: types.Message):
+    await message.reply('Я не понимаю', reply_markup=create_note)
